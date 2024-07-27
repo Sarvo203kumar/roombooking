@@ -1,0 +1,70 @@
+import java.util.Scanner;
+
+public class Main {
+    public static void main(String[] args) {
+        OfficeConfiguration office = OfficeConfiguration.getInstance();
+        Scanner scanner = new Scanner(System.in);
+
+        System.out.println("Welcome to the Smart Office Facility Management System");
+
+        while (true) {
+            System.out.print("Enter command: ");
+            String command = scanner.nextLine();
+
+            String[] parts = command.split(" ");
+            String action = parts[0];
+            String roomName = parts.length > 2 ? parts[2] : "";
+            ConferenceRoom room = office.getRoom("Room " + roomName);
+
+            switch (action) {
+                case "Config":
+                    if (parts[1].equals("room")) {
+                        if (parts[2].equals("count")) {
+                            int count = Integer.parseInt(parts[3]);
+                            office.configureOffice(count);
+                        } else if (parts[2].equals("max") && parts[3].equals("capacity")) {
+                            int capacity = Integer.parseInt(parts[4]);
+                            office.setRoomCapacity("Room " + parts[3], capacity);
+                        }
+                    }
+                    break;
+                case "Block":
+                    if (room != null) {
+                        new BookRoomCommand(room, parts[3], Integer.parseInt(parts[4])).execute();
+                    } else {
+                        System.out.println("Invalid room number. Please enter a valid room number.");
+                    }
+                    break;
+                case "Cancel":
+                    if (room != null) {
+                        new CancelBookingCommand(room).execute();
+                    } else {
+                        System.out.println("Invalid room number. Please enter a valid room number.");
+                    }
+                    break;
+                case "Add":
+                    if (parts[1].equals("occupant")) {
+                        if (room != null) {
+                            new RoomStatusUpdateCommand(room, Integer.parseInt(parts[3])).execute();
+                        } else {
+                            System.out.println("Invalid room number. Please enter a valid room number.");
+                        }
+                    }
+                    break;
+                case "Room":
+                    if (parts[1].equals("status")) {
+                        if (room != null) {
+                            room.updateStatus(0);
+                        } else {
+                            System.out.println("Invalid room number. Please enter a valid room number.");
+                        }
+                    }
+                    break;
+                case "exit":
+                    return;
+                default:
+                    System.out.println("Unknown command.");
+            }
+        }
+    }
+}
