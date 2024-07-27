@@ -1,0 +1,48 @@
+interface Command {
+    void execute();
+}
+
+class BookRoomCommand implements Command {
+    private ConferenceRoom room;
+    private String startTime;
+    private int duration;
+
+    public BookRoomCommand(ConferenceRoom room, String startTime, int duration) {
+        this.room = room;
+        this.startTime = startTime;
+        this.duration = duration;
+    }
+
+    @Override
+    public void execute() {
+        room.book(startTime, duration);
+    }
+}
+
+class CancelBookingCommand implements Command {
+    private ConferenceRoom room;
+
+    public CancelBookingCommand(ConferenceRoom room) {
+        this.room = room;
+    }
+
+    @Override
+    public void execute() {
+        room.cancelBooking();
+    }
+}
+
+class RoomStatusUpdateCommand implements Command {
+    private ConferenceRoom room;
+    private int occupants;
+
+    public RoomStatusUpdateCommand(ConferenceRoom room, int occupants) {
+        this.room = room;
+        this.occupants = occupants;
+    }
+
+    @Override
+    public void execute() {
+        room.updateStatus(occupants);
+    }
+}
