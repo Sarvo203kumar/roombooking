@@ -1,0 +1,52 @@
+import java.util.ArrayList;
+import java.util.List;
+
+interface Observer {
+    void update(String roomName, boolean occupied);
+}
+
+class Sensor {
+    private String roomName;
+    private List<Observer> observers;
+
+    public Sensor(String roomName) {
+        this.roomName = roomName;
+        this.observers = new ArrayList<>();
+    }
+
+    public void addObserver(Observer observer) {
+        observers.add(observer);
+    }
+
+    public void removeObserver(Observer observer) {
+        observers.remove(observer);
+    }
+
+    public void detectOccupancy(boolean occupied) {
+        for (Observer observer : observers) {
+            observer.update(roomName, occupied);
+        }
+    }
+}
+
+class AirConditioning implements Observer {
+    @Override
+    public void update(String roomName, boolean occupied) {
+        if (occupied) {
+            System.out.println("Air Conditioning turned ON in " + roomName);
+        } else {
+            System.out.println("Air Conditioning turned OFF in " + roomName);
+        }
+    }
+}
+
+class Lighting implements Observer {
+    @Override
+    public void update(String roomName, boolean occupied) {
+        if (occupied) {
+            System.out.println("Lights turned ON in " + roomName);
+        } else {
+            System.out.println("Lights turned OFF in " + roomName);
+        }
+    }
+}
