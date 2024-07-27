@@ -1,0 +1,77 @@
+import java.util.Timer;
+import java.util.TimerTask;
+
+class ConferenceRoom {
+    private String name;
+    private boolean booked;
+    private boolean occupied;
+    private int maxCapacity;
+    private int occupants;
+    private Sensor sensor;
+    private Timer timer;
+
+    public ConferenceRoom(String name) {
+        this.name = name;
+        this.booked = false;
+        this.occupied = false;
+        this.maxCapacity = 2; // default minimum capacity to detect occupancy
+        this.occupants = 0;
+        this.sensor = new Sensor(name);
+        this.sensor.addObserver(new AirConditioning());
+        this.sensor.addObserver(new Lighting());
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setMaxCapacity(int maxCapacity) {
+        this.maxCapacity = maxCapacity;
+    }
+
+    public void book(String startTime, int duration) {
+        if (booked) {
+            System.out.println(name + " is already booked during this time. Cannot book.");
+        } else {
+            booked = true;
+            System.out.println(name + " booked from " + startTime + " for " + duration + " minutes.");
+            timer = new Timer();
+            timer.schedule(new TimerTask() {
+                @Override
+                public void run() {
+                    if (!occupied) {
+                        cancelBooking();
+                    }
+                }
+            }, 5 * 60 * 1000);
+        }
+    }
+
+    public void cancelBooking() {
+        if (booked) {
+            booked = false;
+            System.out.println("Booking for " + name + " cancelled successfully.");
+            if (timer != null) {
+                timer.cancel();
+            }
+        } else {
+            System.out.println(name + " is not booked. Cannot cancel booking.");
+        }
+    }
+
+    public void updateStatus(int occupants) {
+        this.occupants = occupants;
+        if (occupants >= 2) {
+            occupied = true;
+            sensor.detectOccupancy(true);
+            System.out.println(name + " is now occupied by " + occupants + " persons. AC and lights turned on.");
+        } else {
+            occupied = false;
+            sensor.detectOccupancy(false);
+            System.out.println(name + " occupancy insufficient to mark as occupied.");
+            if (booked) {
+                cancelBooking();
+            }
+        }
+    }
+}
